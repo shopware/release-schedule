@@ -16,7 +16,7 @@ $releaseScheduleService = new ReleaseSchedule();
 $generateCommand = new GenerateReleaseScheduleCommand($nullLogger, $releaseScheduleService);
 $publishCommand = new PublishReleaseScheduleCommand($nullLogger, $releaseScheduleService, $s3);
 
-$application = new Application('release-schedule', '1.0.0');
+$application = new Application('release-schedule', \Composer\InstalledVersions::getVersion('shopware/release-schedule'));
 $application->add($generateCommand);
 $application->add($publishCommand);
 
