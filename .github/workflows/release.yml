@@ -60,5 +60,5 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             -H "Content-Type: application/octet-stream" \
-            "${{ steps.release.outputs.upload_url }}" \
+            "${{ steps.release.outputs.upload_url }}=release-schedule.phar" \
             --data-binary "@release-schedule.phar"
