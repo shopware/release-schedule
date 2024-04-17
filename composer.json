@@ -1,7 +1,7 @@
 {
     "name": "shopware/release-schedule",
     "type": "project",
-    "license": "proprietary",
+    "license": "MIT",
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
