@@ -14,7 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
     description: <<<EOF
     This command can be used to generate the release schedule for the release
     policy site [1]. It will output the SVG to stdout.
-    
+
     [1]: <info>https://developer.shopware.com/release-notes/#shopware-release-policy</info>
 EOF
 )]
