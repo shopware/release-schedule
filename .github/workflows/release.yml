@@ -10,7 +10,7 @@ jobs:
       - name: Setup php
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.3"
+          coverage: none
       - uses: actions/checkout@v4
       - name: Composer install
         run: |
@@ -32,17 +32,25 @@ jobs:
       contents: write
       pull-requests: read
     steps:
-      - uses: actions/checkout@v4
+      - id: release
+        uses: google-github-actions/release-please-action@v4
+        with:
+          # this assumes that you have created a personal access token
+          # (PAT) and configured it as a GitHub action secret named
+          # `MY_RELEASE_PLEASE_TOKEN` (this secret name is not important).
+          # this is necessary if the release creation also needs to trigger workflows
+          # token: ${{ secrets.MY_RELEASE_PLEASE_TOKEN }}
+
+          # this is a built-in strategy in release-please, see "Action Inputs"
+          # for more options
+          release-type: simple
       - name: Download artifact
         uses: actions/download-artifact@v4
+        if: steps.release.outputs.upload_url
         with:
           name: release-schedule.phar
-      - id: release
-        uses: rymndhng/release-on-push-action@master
-        with:
-          bump_version_scheme: minor
-          tag_prefix: v
       - name: Check Output Parameters
+        if: steps.release.outputs.upload_url
         run: |
           echo "Got tag name ${{ steps.release.outputs.tag_name }}"
           echo "Got release version ${{ steps.release.outputs.version }}"
