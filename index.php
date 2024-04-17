@@ -9,12 +9,11 @@ use Symfony\Component\Console\Application;
 use Psr\Log\NullLogger;
 use AsyncAws\S3\S3Client;
 
-$nullLogger = new NullLogger();
 $s3 = new S3Client();
 $releaseScheduleService = new ReleaseSchedule();
 
-$generateCommand = new GenerateReleaseScheduleCommand($nullLogger, $releaseScheduleService);
-$publishCommand = new PublishReleaseScheduleCommand($nullLogger, $releaseScheduleService, $s3);
+$generateCommand = new GenerateReleaseScheduleCommand($releaseScheduleService);
+$publishCommand = new PublishReleaseScheduleCommand($releaseScheduleService, $s3);
 
 $application = new Application('release-schedule', \Composer\InstalledVersions::getVersion('shopware/release-schedule'));
 $application->add($generateCommand);

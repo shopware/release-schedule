@@ -3,7 +3,6 @@
 namespace Shopware\ReleaseSchedule\Command;
 
 use AsyncAws\S3\S3Client;
-use Psr\Log\LoggerInterface;
 use Shopware\ReleaseSchedule\Service\ReleaseSchedule;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -28,7 +27,6 @@ class PublishReleaseScheduleCommand extends Command
     private bool $dryRun = false;
 
     public function __construct(
-        protected LoggerInterface $logger,
         protected ReleaseSchedule $releaseSchedule,
         protected S3Client $s3
     ) {
@@ -51,11 +49,7 @@ class PublishReleaseScheduleCommand extends Command
         $this->dryRun = (bool) $input->getOption('dry-run');
 
         if ($this->dryRun) {
-            if ($input->isInteractive()) {
-                $this->io->warning('Dry run, skipping state-changing requests.');
-            }
-
-            $this->logger->notice('Dry run, skipping state-changing requests.');
+            $this->io->warning('Dry run, skipping state-changing requests.');
         }
     }
 
