@@ -49,7 +49,7 @@ jobs:
         if: steps.release.outputs.upload_url
         with:
           name: release-schedule.phar
-      - name: Check Output Parameters
+      - name: Upload release artifact
         if: steps.release.outputs.upload_url
         run: |
           echo "Got tag name ${{ steps.release.outputs.tag_name }}"
