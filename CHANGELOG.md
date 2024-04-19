@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/shopware/release-schedule/compare/v1.0.0...v1.1.0) (2024-04-19)
+
+
+### Features
+
+* Test conventional commits ([3f3af3a](https://github.com/shopware/release-schedule/commit/3f3af3a5ff4b90c8693d85806cb55cf7cd9569b2))
+
+
+### Bug Fixes
+
+* construct url manually, because async-aws has no api for it ([c3c24da](https://github.com/shopware/release-schedule/commit/c3c24da9f508ea363e9b6237cb67e7048e2b7c80))
+
 ## 1.0.0 (2024-04-17)
 
 
