@@ -2,6 +2,7 @@
 
 namespace Shopware\ReleaseSchedule\Command;
 
+use AsyncAws\Core\Configuration;
 use AsyncAws\S3\S3Client;
 use Shopware\ReleaseSchedule\Service\ReleaseSchedule;
 use Symfony\Component\Console\Command\Command;
@@ -80,6 +81,8 @@ class PublishReleaseScheduleCommand extends Command
             $response = $this->s3->putObject($args);
         }
 
-        $this->io->success(sprintf('Release schedule available at: %s', $response->get('ObjectURL')));
+        $config = $this->s3->getConfiguration();
+        $url = sprintf('https://%s.s3.%s.amazonaws.com/%s', $args['Bucket'], $config->get(Configuration::OPTION_REGION), $args['Key']);
+        $this->io->success('Release schedule available at: ' . $url);
     }
 }
