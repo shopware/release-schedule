@@ -79,7 +79,7 @@ SVG;
 
     private function getSchedulePeriod(): DatePeriod
     {
-        $startDate = new DateTime('-3 years');
+        $startDate = new DateTime('2021-01-01');
         $endDate = new DateTime('+2 years');
 
         $startDate->modify('first day of January');
