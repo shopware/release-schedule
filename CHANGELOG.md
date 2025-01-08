@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/shopware/release-schedule/compare/v1.1.0...v1.1.1) (2025-01-08)
+
+
+### Bug Fixes
+
+* calendar start period ([6a3b509](https://github.com/shopware/release-schedule/commit/6a3b509fafb9266e4122838dbd83644a330c63ec))
+
 ## [1.1.0](https://github.com/shopware/release-schedule/compare/v1.0.0...v1.1.0) (2024-04-19)
 
 
