@@ -32,7 +32,8 @@ This repository provides an up-to-date calendar and structured information about
    - The published SVG can be embedded in documentation, linked from the main README, or displayed on external sites via its raw GitHub URL.
    - Example inclusion in Markdown:
      ```
-     ![Shopware Release Schedule](./schedule.svg to Use
+     ![Shopware Release Schedule](./schedule.svg)
+     ```
 
 - Browse the schedule in Markdown or JSON to keep track of planned and historical releases.
 - View or embed the SVG to display a visual representation of the Shopware release lifecycle.
