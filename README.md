@@ -1,4 +1,4 @@
-## Shopware release-schedule
+## Shopware Release Schedule
 
 This repository provides an up-to-date calendar and structured information about Shopware’s product release schedules, including automated generation and publishing of SVG assets that visualize the release lifecycle. The schedule and SVG graphics help the Shopware community, partners, and users track upcoming releases, understand version timelines, and plan upgrades.
 
