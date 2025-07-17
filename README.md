@@ -24,7 +24,7 @@ This repository provides an up-to-date calendar and structured information about
    - The script transforms this structured data into an SVG diagram illustrating the release schedule.
 
 2. **Automated Publishing**  
-   - After generation, the SVG file (e.g., `schedule.svg`) is placed in the repository—typically in the root or a dedicated assets directory (e.g., `/assets/`).
+   - After generation, the SVG file (e.g., `schedule.svg`) is placed in the repository — typically in the root or a dedicated assets directory (e.g., `/assets/`).
    - In most setups, SVG generation is triggered automatically via a CI workflow (e.g., GitHub Actions) whenever the schedule data is updated.
    - With each change, the freshly generated SVG is committed and pushed alongside the updated schedule data, ensuring users always have access to the current visual representation.
 
