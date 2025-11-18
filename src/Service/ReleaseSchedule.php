@@ -18,9 +18,9 @@ class ReleaseSchedule
         $this->client = Client::createWithHttpClient(new HttplugClient());
     }
 
-    public function generateReleaseCalendar(): string
+    public function generateReleaseCalendar(?string $releasesJsonPath = null): string
     {
-        $releases = $this->getReleases();
+        $releases = $this->getReleases(path: $releasesJsonPath);
 
         // Current date for "Today" marker
         $today = date('F j, Y');
@@ -68,13 +68,17 @@ class ReleaseSchedule
 SVG;
     }
 
-    private function getReleases(int $projectId = 1, string $branch = 'trunk'): array
+    private function getReleases(int $projectId = 1, string $branch = 'trunk', ?string $path = null): array
     {
-        $fileInfo = $this->client->api('repo')->contents()->show('shopware', 'shopware', 'releases.json', 'trunk');
+        if ($path === null) {
+            $fileInfo = $this->client->api('repo')->contents()->show('shopware', 'shopware', 'releases.json', $branch);
 
-        $releases = json_decode(base64_decode($fileInfo['content']), true);
+            $releases = base64_decode($fileInfo['content']);
+        } else {
+            $releases = file_get_contents($path);
+        }
 
-        return $releases;
+        return json_decode($releases, true);
     }
 
     private function getSchedulePeriod(): DatePeriod
