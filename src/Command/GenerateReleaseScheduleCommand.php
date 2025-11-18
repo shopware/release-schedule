@@ -6,6 +6,7 @@ use Shopware\ReleaseSchedule\Service\ReleaseSchedule;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -31,7 +32,8 @@ class GenerateReleaseScheduleCommand extends Command
     protected function configure(): int
     {
         $this->setDescription('Generate a release calendar for Shopware 6')
-            ->setHelp('This command generates a release calendar for Shopware 6');
+            ->setHelp('This command generates a release calendar for Shopware 6')
+            ->addOption('path', 'p', InputOption::VALUE_OPTIONAL,'Path to the releases.json, if a local file is to be used');
 
         return Command::SUCCESS;
     }
@@ -43,7 +45,8 @@ class GenerateReleaseScheduleCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $calendar = $this->releaseSchedule->generateReleaseCalendar();
+        $path = $input->getOption('path');
+        $calendar = $this->releaseSchedule->generateReleaseCalendar(is_string($path) ? $path : null);
 
         $this->io->text($calendar);
 
