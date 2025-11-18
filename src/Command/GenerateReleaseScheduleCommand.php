@@ -46,6 +46,11 @@ class GenerateReleaseScheduleCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $path = $input->getOption('path');
+
+        if (!is_string($path) || mb_strlen($path) < 1) {
+            $path = null;
+        }
+
         $calendar = $this->releaseSchedule->generateReleaseCalendar(is_string($path) ? $path : null);
 
         $this->io->text($calendar);
