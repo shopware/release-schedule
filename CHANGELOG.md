@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.2](https://github.com/shopware/release-schedule/compare/v1.1.1...v1.1.2) (2026-10-28)
+
+
+### Bug Fixes
+
+* only check nextRelease in the same major ([4c6b4fe](https://github.com/shopware/release-schedule/commit/4c6b4fef44c23c9a0d3349c3223aad5868373d78))
+* unset path if empty string ([7ff5894](https://github.com/shopware/release-schedule/commit/7ff5894278a7d3bf5353ecf37697b7be759ee729))
+
+
+### Miscellaneous Chores
+
+* add --path flag to quickly test local changes ([c436100](https://github.com/shopware/release-schedule/commit/c4361007a20e98829b35149d690cf84517572c65))
+* adds readme and license ([6358437](https://github.com/shopware/release-schedule/commit/63584375a5e926566358783266fbb4e51f0df760))
+
 ## [1.1.1](https://github.com/shopware/release-schedule/compare/v1.1.0...v1.1.1) (2025-01-08)
 
 
