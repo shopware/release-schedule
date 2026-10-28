@@ -231,7 +231,7 @@ SVG;
         for ($i = 0; $i < $length; ++$i) {
             $release = $releases[$i];
 
-            if (array_key_exists($i + 1, $releases)) {
+            if (array_key_exists($i + 1, $releases) && str_starts_with($releases[$i + 1]["version"], substr($release["version"], 0, 4))) {
                 $nextRelease = $releases[$i + 1];
             } else {
                 $nextRelease = null;
@@ -307,7 +307,7 @@ SVG;
         for ($i = 0; $i < $length; ++$i) {
             $release = $releases[$i];
 
-            if (array_key_exists($i + 1, $releases)) {
+            if (array_key_exists($i + 1, $releases) && str_starts_with($releases[$i + 1]["version"], substr($release["version"], 0, 4))) {
                 $nextRelease = $releases[$i + 1];
             } else {
                 $nextRelease = null;
