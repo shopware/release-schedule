@@ -22,6 +22,10 @@ class ReleaseSchedule
     {
         $releases = $this->getReleases(path: $releasesJsonPath);
 
+        if (array_filter($releases, fn (array $release) => ($release['type'] ?? null) === 'branch')) {
+            return $this->generateBranchCalendar($releases);
+        }
+
         // Current date for "Today" marker
         $today = date('F j, Y');
 
@@ -66,6 +70,129 @@ class ReleaseSchedule
 
   $legendSVG
 SVG;
+    }
+
+    private function generateBranchCalendar(array $releases): string
+    {
+        $branches = array_values(array_filter($releases, fn (array $release) => ($release['type'] ?? null) === 'branch'));
+        $minors = array_values(array_filter($releases, fn (array $release) => ($release['type'] ?? null) !== 'branch'));
+        $today = date('F j, Y');
+        $period = $this->getSchedulePeriod();
+        $years = $this->getYears($period);
+        $calendarHeight = count($branches) * 40;
+        $totalHeight = $calendarHeight + 160;
+        $calendarScale = 700 / ($period->getEndDate()->getTimestamp() - $period->getStartDate()->getTimestamp());
+
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 800 ' . $totalHeight . '">';
+        $svg .= $this->getStyleSVG();
+        $svg .= '<style>g.neutral rect { fill: transparent; } g.neutral text { fill: var(--text-color); }</style>';
+        $svg .= '<view id="calendar-years" viewBox="0 0 800 40" />';
+        $svg .= '<view id="calendar-legend" viewBox="0 ' . ($calendarHeight + 60) . ' 800 100" />';
+
+        foreach ($branches as $i => $branch) {
+            $id = str_replace('.', '-', $branch['version']);
+            $svg .= '<view id="branch-' . $id . '" viewBox="0 ' . (40 + $i * 40) . ' 800 40" />';
+        }
+
+        $svg .= $this->getYearsSVG($years, 700 / count($years), $calendarHeight, 100);
+        $svg .= $this->getBranchRowsSVG($branches, $period, $calendarScale, $today);
+        $svg .= $this->getTodayMarkerSVG($today, $period, $calendarScale, $calendarHeight, 100);
+        $svg .= str_replace('</svg>', '', $this->getLegendSVG($calendarHeight));
+
+        // Named views let the page expand minor rows while publishing the same SVG asset.
+        $detailOffset = $totalHeight + 40;
+        foreach ($branches as $branch) {
+            $branchMinors = array_values(array_filter($minors, fn (array $minor) => $this->getBranchVersion($minor['version']) === $branch['version']));
+            if ($branchMinors === []) {
+                continue;
+            }
+
+            $id = str_replace('.', '-', $branch['version']);
+            $detailHeight = count($branchMinors) * 40;
+            $svg .= '<view id="minors-' . $id . '" viewBox="0 ' . ($detailOffset + 40) . ' 800 ' . $detailHeight . '" />';
+            $svg .= '<g transform="translate(0 ' . $detailOffset . ')">';
+            $svg .= $this->getYearsSVG($years, 700 / count($years), $detailHeight, 100);
+            $svg .= $this->getBranchRowsSVG($branchMinors, $period, $calendarScale, $today, true);
+            $svg .= $this->getTodayMarkerSVG($today, $period, $calendarScale, $detailHeight, 100);
+            $svg .= '</g>';
+            $detailOffset += $detailHeight + 160;
+        }
+
+        return $svg . '</svg>';
+    }
+
+    private function getBranchRowsSVG(array $releases, DatePeriod $period, float $calendarScale, string $today, bool $minors = false): string
+    {
+        $svg = '<g class="branches">';
+        $periodStart = $period->getStartDate()->getTimestamp();
+        $periodEnd = $period->getEndDate()->getTimestamp();
+        $todayTime = strtotime($today);
+
+        foreach ($releases as $i => $release) {
+            $startDate = strtotime($release['release_date']);
+            $endDate = $minors
+                ? $this->getMinorMaintainedEndDate($release, $releases[$i + 1] ?? null)
+                : ($release['maintained_eol'] === false ? $periodEnd : strtotime($release['maintained_eol']));
+            $version = htmlspecialchars($release['version'], ENT_QUOTES | ENT_XML1, 'UTF-8');
+            $versionLink = $minors
+                ? 'https://github.com/shopware/shopware/releases/tag/v' . $version
+                : 'https://github.com/shopware/shopware/releases?q=v' . rawurlencode($release['version'] . '.');
+            $y = 40 + $i * 40;
+            $rectY = $y + 5;
+            $labelY = $y + 20;
+            $segments = [['stable', $startDate, $endDate]];
+            $maintained = $minors ? $todayTime <= $endDate : $todayTime < $endDate;
+            $class = $todayTime < $startDate ? 'unstable' : ($maintained ? 'stable' : 'neutral');
+
+            if (!$minors) {
+                $supportStart = $endDate;
+                if ($release['extended_eol'] !== false) {
+                    $extendedEnd = strtotime($release['extended_eol']);
+                    $segments[] = ['lts', $supportStart, $extendedEnd];
+                    if ($todayTime >= $endDate && $todayTime < $extendedEnd) {
+                        $class = 'lts';
+                    }
+                    $supportStart = $extendedEnd;
+                }
+
+                if ($release['security_eol'] !== false) {
+                    $securityEnd = strtotime($release['security_eol']);
+                    $segments[] = ['security', $supportStart, $securityEnd];
+                    if ($todayTime >= $supportStart && $todayTime < $securityEnd) {
+                        $class = 'security';
+                    } elseif ($todayTime >= $securityEnd) {
+                        $class = 'eol';
+                    }
+                }
+            }
+
+            $svg .= '<line x1="0" y1="' . $y . '" x2="800" y2="' . $y . '"></line>';
+            $svg .= '<a xlink:href="' . $versionLink . '" target="_blank">';
+            foreach ($segments as [$segmentClass, $start, $end]) {
+                $x = (($start - $periodStart) * $calendarScale) + 100;
+                $width = max(0, $end - $start) * $calendarScale;
+                $svg .= '<rect class="' . $segmentClass . '" data-release-version="' . $version . '" x="' . $x . '" y="' . $rectY . '" width="' . $width . '" height="30"></rect>';
+            }
+            $svg .= '</a><a xlink:href="' . $versionLink . '" target="_blank"><g class="' . $class . ' branch-labels" data-label-version="' . $version . '">';
+            $svg .= '<rect x="1" y="' . $rectY . '" width="70" height="30"></rect><text x="35" y="' . $labelY . '">' . $version . '</text></g></a>';
+        }
+
+        return $svg . '</g>';
+    }
+
+    private function getBranchVersion(string $version): string
+    {
+        return implode('.', array_slice(explode('.', $version), 0, 2));
+    }
+
+    private function getMinorMaintainedEndDate(array $release, ?array $nextRelease): int
+    {
+        // Preserve the existing next-minor / 31-day fallback; this is not a 31-day cap.
+        if ($nextRelease !== null && $this->getBranchVersion($nextRelease['version']) === $this->getBranchVersion($release['version'])) {
+            return strtotime($nextRelease['release_date']);
+        }
+
+        return strtotime('+31 days', strtotime($release['release_date']));
     }
 
     private function getReleases(int $projectId = 1, string $branch = 'trunk', ?string $path = null): array
@@ -420,3 +547,4 @@ SVG;
 SVG;
     }
 }
+

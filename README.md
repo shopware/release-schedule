@@ -53,3 +53,62 @@ View the latest visual in [`schedule.svg`](./schedule.svg).
 ## Contributing
 
 If you notice outdated or incorrect dates, please open an issue or submit a pull request. Updates to the release schedule will automatically trigger SVG regeneration and publishing.
+
+## Branch overview and expandable minor releases
+
+The data source remains `shopware/shopware/releases.json` on `trunk`. A flat
+array can contain branch records alongside the existing minor release records:
+
+```json
+{
+  "type": "branch",
+  "version": "6.7",
+  "release_date": "2025-06-17",
+  "maintained_eol": "2027-06-01",
+  "extended_eol": "2029-06-01",
+  "security_eol": "2031-06-01"
+}
+```
+
+A branch record owns the maintained, Extended Support and security periods.
+`maintained_eol: false` means that no transition has been scheduled: the
+maintained bar reaches the current calendar edge. `security_eol: false` means
+no security EOL has been assigned. Neither value invents a future release date.
+The meaning of `extended_eol: false` is unchanged: no Extended Support period.
+
+Minor records keep their existing format and timing: maintained until the next
+minor of the same branch, or 31 days when there is no next minor. There is no new
+31-day maximum. In branch mode, minor details show this maintained period only;
+support for the whole branch appears on its overview row.
+
+The publisher still uploads one `release-schedule/schedule.svg` object. Its
+default view is the overview. Named SVG views allow the release-notes page to
+use native HTML `details` without JavaScript or additional published files:
+
+- `schedule.svg#calendar-years`: shared year header.
+- `schedule.svg#branch-6-7`: the 6.7 overview row (the same pattern works for other branches).
+- `schedule.svg#minors-6-7`: the 6.7 minor rows.
+- `schedule.svg#calendar-legend`: the existing Today marker and legend.
+
+The calendar width and date range are unchanged. Data without branch records
+uses the existing renderer, so the generator can be released before the data
+and page changes.
+
+Run the dependency-free rendering regressions with:
+
+```sh
+php tests/ReleaseScheduleTest.php
+```
+
+For a local SVG, use the existing generate command with `--path releases.json`.
+To publish this behavior, first release a new generator PHAR, then merge the
+branch data in Shopware and regenerate the public SVG. The release-notes page
+can use the named views after that SVG has been published.
+
+### Preview
+
+Local browser preview with the proposed branch data, generated on 29 October 2026.
+
+![Branch overview](docs/calendar-collapsed.jpg)
+
+![Expanded 6.7 minor releases](docs/calendar-expanded.jpg)
