@@ -49,7 +49,8 @@ checkDuration($svg, '6.5', '2023-05-03', '2024-03-21', $scale);
 checkDuration($svg, '6.6', '2024-03-21', '2025-06-17', $scale);
 checkDuration($svg, '6.7', '2025-06-17', '2027-06-01', $scale);
 checkDuration($svg, '6.6.9.0', '2024-12-03', '2025-02-03', $scale);
-checkDuration($svg, '6.7.15.0', '2026-10-05', '2026-11-05', $scale);
+checkDuration($svg, '6.7.15.0', '2026-10-05', '2026-11-02', $scale);
+checkDuration($svg, '6.7.16.0', '2026-11-02', '2026-12-03', $scale);
 checkSegmentStart($svg, '6.5', 'lts', '2024-03-21', $period->getStartDate()->getTimestamp(), $scale);
 checkSegmentStart($svg, '6.6', 'lts', '2025-06-17', $period->getStartDate()->getTimestamp(), $scale);
 checkSegmentStart($svg, '6.7', 'lts', '2027-06-01', $period->getStartDate()->getTimestamp(), $scale);
@@ -74,6 +75,18 @@ $label = $reflection->getMethod('getBranchRowsSVG')->invoke(
     true
 );
 check(str_contains($label, 'class="neutral branch-labels" data-label-version="6.7.15.0"'), 'A superseded minor must not be labeled LTS or EOL');
+
+// The replacement minor takes over on its release date.
+$minorLabels = $reflection->getMethod('getBranchRowsSVG')->invoke(
+    $schedule,
+    [$byVersion['6.7.15.0'], $byVersion['6.7.16.0']],
+    $period,
+    $scale,
+    'November 2, 2026',
+    true
+);
+check(str_contains($minorLabels, 'class="neutral branch-labels" data-label-version="6.7.15.0"'), 'The previous minor must be superseded on the next release date');
+check(str_contains($minorLabels, 'class="stable branch-labels" data-label-version="6.7.16.0"'), 'The new minor must be maintained on its release date');
 
 $branches = array_values(array_filter($releases, fn (array $release) => ($release['type'] ?? null) === 'branch'));
 foreach ([
@@ -105,4 +118,3 @@ try {
 }
 
 echo "ReleaseSchedule regression checks passed.\n";
-

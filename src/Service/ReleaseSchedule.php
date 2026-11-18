@@ -141,7 +141,7 @@ SVG;
             $rectY = $y + 5;
             $labelY = $y + 20;
             $segments = [['stable', $startDate, $endDate]];
-            $maintained = $minors ? $todayTime <= $endDate : $todayTime < $endDate;
+            $maintained = $todayTime < $endDate;
             $class = $todayTime < $startDate ? 'unstable' : ($maintained ? 'stable' : 'neutral');
 
             if (!$minors) {
@@ -547,4 +547,5 @@ SVG;
 SVG;
     }
 }
+
 

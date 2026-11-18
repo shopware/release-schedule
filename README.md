@@ -77,7 +77,8 @@ no security EOL has been assigned. Neither value invents a future release date.
 The meaning of `extended_eol: false` is unchanged: no Extended Support period.
 
 Minor records keep their existing format and timing: maintained until the next
-minor of the same branch, or 31 days when there is no next minor. There is no new
+minor of the same branch, or 31 days when there is no next minor.
+The maintained end date is exclusive: the replacement minor takes over on its release date. There is no new
 31-day maximum. In branch mode, minor details show this maintained period only;
 support for the whole branch appears on its overview row.
 
@@ -107,7 +108,7 @@ can use the named views after that SVG has been published.
 
 ### Preview
 
-Local browser preview with the proposed branch data, generated on 29 October 2026.
+Local browser preview with the proposed branch data, including 6.7.16.0, generated on 18 November 2026.
 
 ![Branch overview](docs/calendar-collapsed.jpg)
 
